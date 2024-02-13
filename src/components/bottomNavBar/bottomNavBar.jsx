@@ -1,15 +1,17 @@
 import React from "react";
 import { Box, IconButton, Typography } from "@mui/material";
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import HomeIcon from "@mui/icons-material/Home";
+import RedeemIcon from "@mui/icons-material/Redeem";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const BottomNavbar = () => {
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
-  const isHomeSelected = location.pathname === '/home';
-  const isProfileSelected = location.pathname === '/profile';
+  const isHomeSelected = location.pathname === "/home";
+  const isProfileSelected = location.pathname === "/profile";
 
   return (
     <Box
@@ -24,40 +26,59 @@ const BottomNavbar = () => {
         display: "flex",
         justifyContent: "space-evenly",
         alignItems: "center",
-        backgroundColor: "#1976d2",
+        boxShadow: 1,
+        backgroundColor: "#FFFFFF",
       }}
     >
       <IconButton
         sx={{
-          width: '60px',
-          height: '60px',
-          color: isHomeSelected ? '#FFFFFF' : '#000000', 
-          '&:hover .MuiSvgIcon-root, &:hover .MuiTypography-root': { color: '#FFFFFF' }, 
+          width: "50px",
+          height: "50px",
+          color: isHomeSelected ? "#007580" : "	#666666",
+          "&:hover .MuiSvgIcon-root, &:hover .MuiTypography-root": {
+            color: "#007580",
+          },
         }}
-        onClick={() => navigate("/home")} 
+        onClick={() => navigate("/home")}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <HomeIcon />
-          <Typography variant='caption'>
-            HOME
-          </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          {isHomeSelected ? (
+            <RedeemIcon sx={{ width: "30px", height: "30px" }} />
+          ) : (
+            <HomeIcon sx={{ width: "30px", height: "30px" }} />
+          )}
         </Box>
       </IconButton>
-      
+
       <IconButton
         sx={{
-          width: '60px',
-          height: '60px',
-          color: isProfileSelected ? '#FFFFFF' : '#000000', 
-          '&:hover .MuiSvgIcon-root, &:hover .MuiTypography-root': { color: '#FFFFFF' }, 
+          width: "50px",
+          height: "50px",
+          color: isProfileSelected ? "#007580" : "#666666",
+          "&:hover .MuiSvgIcon-root, &:hover .MuiTypography-root": {
+            color: "#007580",
+          },
         }}
         onClick={() => navigate("/profile")}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <ManageAccountsIcon />
-          <Typography variant='caption'>
-            PROFILE
-          </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          {isProfileSelected ? (
+            <EmojiPeopleIcon sx={{ width: "30px", height: "30px" }} />
+          ) : (
+            <ManageAccountsIcon sx={{ width: "30px", height: "30px" }} />
+          )}
         </Box>
       </IconButton>
     </Box>
