@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import fs from "fs";
 import "./homePage.css";
 import {
   Slider,
@@ -21,21 +22,46 @@ import DropzoneAreaExample from "../dropZone/dropZone";
 import BottomNavbar from "../bottomNavBar/bottomNavBar";
 import Header from "../header/header";
 import { useNavigate, useLocation } from "react-router-dom";
-import OpenAI from "openai";
+//import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY || "";
+const geminiAPIKey = import.meta.env.VITE_GEMINI_API_KEY || "";
+/*
 const openai = new OpenAI({
   apiKey: openaiApiKey,
   dangerouslyAllowBrowser: true,
   organization: "org-y9B1VFvuzhsYHcpG3KJWqvKR",
-});
+});*/
+const gemini = new GoogleGenerativeAI(geminiAPIKey);
+//maybe pro to input both img for gift and text prompt?
+const geminiModel = gemini.getGenerativeModel({model: "gemini-pro-vision"}); 
 
-const getGPTRequests = async (
+function fileToGenerativePart(content, mimeType) {
+  return {
+    inlineData: {
+      data: content,
+      mimeType
+    },
+  };
+}
+const readFileAsBase64 = (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result.split(",")[1]);
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+
+const getGeminiRequests = async (
   sliderValue,
   ageValue,
   relationshipValue,
   genderValue,
-  moreInfo
+  moreInfo,
+  images
 ) => {
   const message = `Analyze styles and preferences to suggest the perfect, stress-free gift 
                   based on the following information about the person receiving this gift:
@@ -43,18 +69,30 @@ const getGPTRequests = async (
                   give me 3 products with names and a short description for each product in 50 words using this following format: 
                   Recommended Product1: name of Product1, Description:
                   Recommended Product2: name of Product2, Description:
-                  Recommended Product3: name of Product3, Description: , etc.`;
-  const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo-16k",
-    messages: [{ role: "system", content: "You are a helpful assistant that speaks English solely for responding." },{ role: "user", content: message }],
-    temperature: 2,
-    max_tokens: 5000,
-  });
-  return response;
+                  Recommended Product3: name of Product3, Description:. Also, use the uploaded images, if any is provided with text-based input, for choosing most suitable gifts for recommendation that is similar to the images' vibes!`;
+  //convert image files into format acceptable by gemini! 
+  const convImages = await Promise.all(
+    images.map(async img => {
+      const curFileContent = await readFileAsBase64(img);
+      return fileToGenerativePart(curFileContent, img.type);
+    })
+  );
+  //call to gemini! 
+  const res= await geminiModel.generateContent([message, ...convImages]);
+  const response = await res.response; 
+  //need to convert final response as a stringified version1 
+  const txt = response.text(); 
+  const products = txt.split("\n");
+  return products; 
 };
 
 const HomePage = ({}) => {
   const navigate = useNavigate();
+  //state keeping track of uploaded images describing gift so far! 
+  const [images, setImages] = React.useState([]);
+  const handleImagesChange = (newFiles) => {
+    setImages((prevFiles) => [...prevFiles, ...newFiles]); 
+  }; 
   const [sliderValue, setSliderValue] = React.useState([20, 40]);
   const handleSliderChange = (event) => {
     setSliderValue(event.target.value);
@@ -82,20 +120,21 @@ const HomePage = ({}) => {
   const [loading, setLoading] = useState(false);
   const handleGeneratePlan = async () => {
     setLoading(true);
-    const response = await getGPTRequests(
+    const response = await getGeminiRequests(
       sliderValue,
       ageValue,
       relationshipValue,
       genderValue,
-      moreInfo
+      moreInfo,
+      images
     );
-    const rec = response.choices[0].message.content
-    setRecommendation(rec);
+    //const rec = response.choices[0].message.content
+    setRecommendation(response);
     setLoading(false);
     setIsPlanGenerated(true);
     //change to recommendations page and pass on the gpt returned resp to use for rendering 
     //product recs! 
-    navigate("/recommendations", {state: {recommendation: rec}}); 
+    navigate("/recommendations", {state: {recommendation: response}}); 
   };
   const [isPlanGenerated, setIsPlanGenerated] = useState(false);
   const Loader = () => {
@@ -133,7 +172,7 @@ const HomePage = ({}) => {
         >
           <Box sx={{ minWidth: 200 }}>
             <FormControl fullWidth sx={{ my: 2 }}>
-              <DropzoneAreaExample></DropzoneAreaExample>
+              <DropzoneAreaExample handleImagesChange={handleImagesChange}></DropzoneAreaExample>
             </FormControl>
 
             <FormControl fullWidth>
