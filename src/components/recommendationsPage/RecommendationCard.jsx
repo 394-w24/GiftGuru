@@ -36,7 +36,7 @@ const RecommendationCard = ({pair}) => {
                         </DialogActions>
                     </Dialog>
                 </Card>
-         </Grid>)
+         </Grid>) 
 }
 
 export default RecommendationCard
