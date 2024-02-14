@@ -24,11 +24,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import OpenAI from "openai";
 
 const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY || "";
-
 const openai = new OpenAI({
   apiKey: openaiApiKey,
   dangerouslyAllowBrowser: true,
-  organization: "org-e8a4OqaRbXH1rSndFxTMj8KJ",
+  organization: "org-y9B1VFvuzhsYHcpG3KJWqvKR",
 });
 
 const getGPTRequests = async (
@@ -42,21 +41,20 @@ const getGPTRequests = async (
                   based on the following information about the person receiving this gift:
                   Budget Range: ${sliderValue}, Age Range: ${ageValue}, Who am I giving it to: ${relationshipValue}, Gender: ${genderValue}, Details: ${moreInfo}, 
                   give me 3 products with names and a short description for each product in 50 words using this following format: 
-                  Recommended Product1: name of product1, Description:
-                  Recommended Product2: name of product2, Description:
-                  Recommended Product3: name of product3, Description: `;
+                  Recommended Product1: name of Product1, Description:
+                  Recommended Product2: name of Product2, Description:
+                  Recommended Product3: name of Product3, Description: , etc.`;
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo-16k",
-    messages: [{ role: "user", content: message }],
+    messages: [{ role: "system", content: "You are a helpful assistant that speaks English solely for responding." },{ role: "user", content: message }],
     temperature: 2,
-    max_tokens: 1000,
+    max_tokens: 5000,
   });
   return response;
 };
 
 const HomePage = ({}) => {
   const navigate = useNavigate();
-
   const [sliderValue, setSliderValue] = React.useState([20, 40]);
   const handleSliderChange = (event) => {
     setSliderValue(event.target.value);
@@ -80,6 +78,7 @@ const HomePage = ({}) => {
   const [moreInfo, setMoreInfo] = useState("");
 
   const [recommendation, setRecommendation] = useState("");
+  console.log(`recommendation: ${recommendation}`)
   const [loading, setLoading] = useState(false);
   const handleGeneratePlan = async () => {
     setLoading(true);
@@ -94,7 +93,6 @@ const HomePage = ({}) => {
     setLoading(false);
     setIsPlanGenerated(true);
   };
-
   const [isPlanGenerated, setIsPlanGenerated] = useState(false);
 
   const Loader = () => {
