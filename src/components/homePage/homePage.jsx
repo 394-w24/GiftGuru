@@ -82,7 +82,9 @@ const getGeminiRequests = async (
   const response = await res.response; 
   //need to convert final response as a stringified version1 
   const txt = response.text(); 
-  const products = txt.split("\n");
+  const products = txt.split(":");
+  console.log(`products: \n`)
+  console.log(products); 
   return products; 
 };
 
@@ -130,6 +132,8 @@ const HomePage = ({}) => {
     );
     //const rec = response.choices[0].message.content
     setRecommendation(response);
+    console.log(`response in handleGeneratePlan: \n`)
+    console.log(response); 
     setLoading(false);
     setIsPlanGenerated(true);
     //change to recommendations page and pass on the gpt returned resp to use for rendering 
