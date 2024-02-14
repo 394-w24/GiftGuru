@@ -7,10 +7,12 @@ import {
     Box,
     Typography,
   } from "@mui/material";
-  
+import { useLocation } from "react-router-dom";
 
 const RecommendationsPage = () => {
-
+    const location = useLocation();
+    const rec = location.state ? location.state.recommendation : ""; 
+    console.log(`rec: ${rec}`); 
     return (
         <Box
             sx={{

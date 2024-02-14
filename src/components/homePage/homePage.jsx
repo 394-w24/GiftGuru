@@ -89,12 +89,15 @@ const HomePage = ({}) => {
       genderValue,
       moreInfo
     );
-    setRecommendation(response.choices[0].message.content);
+    const rec = response.choices[0].message.content
+    setRecommendation(rec);
     setLoading(false);
     setIsPlanGenerated(true);
+    //change to recommendations page and pass on the gpt returned resp to use for rendering 
+    //product recs! 
+    navigate("/recommendations", {state: {recommendation: rec}}); 
   };
   const [isPlanGenerated, setIsPlanGenerated] = useState(false);
-
   const Loader = () => {
     const [text, setText] = useState("");
     useEffect(() => {
