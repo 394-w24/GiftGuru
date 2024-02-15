@@ -67,7 +67,7 @@ const getGeminiRequests = async (
                   Recommended Product1: name of Product1\n
                   Recommended Product2: name of Product2\n
                   Recommended Product3: name of Product3.\n Also, use the uploaded images, if any is provided with text-based input, for choosing most suitable gifts for recommendation that is similar to the images' vibes!`;*/
-  const message = `Can you give me set of product tags that relates to inputted images?`
+  const message = `Can you give me set of product tags that relates to inputted images, the maximum tags you can give is 10?`
   //convert image files into format acceptable by gemini! 
   const convImages = await Promise.all(
       images.map(async img => {
