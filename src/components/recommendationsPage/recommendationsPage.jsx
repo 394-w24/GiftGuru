@@ -13,12 +13,8 @@ import Grid from '@mui/system/Unstable_Grid';
 const RecommendationsPage = () => {
     const location = useLocation();
     const rec = location.state ? location.state.recommendation : ""; 
+    console.log(`rec: ${rec}`); 
     const pairs = []
-    for(var i = 1; i < rec.length; i+=2){
-        const curProd = rec[i].split(',')[0];
-        const curDesc = rec[i+1].split('\n')[0]; 
-        pairs.push([curProd, curDesc]); 
-    }
     return (
         <Box
             sx={{
