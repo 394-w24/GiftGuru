@@ -24,7 +24,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 //import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const geminiAPIKey = import.meta.env.VITE_GEMINI_API_KEY || apiKey;
+const geminiAPIKey = import.meta.env.VITE_GEMINI_API_KEY || apiKey || "";
 /*
 const openai = new OpenAI({
   apiKey: openaiApiKey,
@@ -87,7 +87,7 @@ const HomePage = ({}) => {
   const handleImagesChange = (newFiles) => {
     setImages((prevFiles) => [...prevFiles, ...newFiles]);
   };
-  const [sliderValue, setSliderValue] = React.useState([10, 20]);
+  const [sliderValue, setSliderValue] = React.useState([10, 100]);
   const handleSliderChange = (event, newValue) => {
     if (newValue[1] - newValue[0] >= 10) {
       setSliderValue(newValue);
