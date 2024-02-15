@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import fs from "fs";
 import "./homePage.css";
 import {
   Slider,
@@ -25,7 +24,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 //import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const geminiAPIKey = import.meta.env.VITE_GEMINI_API_KEY || "";
+const geminiAPIKey = import.meta.env.VITE_GEMINI_API_KEY || apiKey;
 /*
 const openai = new OpenAI({
   apiKey: openaiApiKey,
@@ -33,14 +32,13 @@ const openai = new OpenAI({
   organization: "org-y9B1VFvuzhsYHcpG3KJWqvKR",
 });*/
 const gemini = new GoogleGenerativeAI(geminiAPIKey);
-//maybe pro to input both img for gift and text prompt?
-const geminiModel = gemini.getGenerativeModel({model: "gemini-pro-vision"}); 
+const geminiModel = gemini.getGenerativeModel({ model: "gemini-pro-vision" });
 
 function fileToGenerativePart(content, mimeType) {
   return {
     inlineData: {
       data: content,
-      mimeType
+      mimeType,
     },
   };
 }
@@ -53,7 +51,6 @@ const readFileAsBase64 = (file) => {
     reader.readAsDataURL(file);
   });
 };
-
 
 const getGeminiRequests = async (
   sliderValue,
@@ -78,27 +75,23 @@ const getGeminiRequests = async (
         return fileToGenerativePart(curFileContent, img.type);
       })
   );
-  //call to gemini! 
-  const res= await geminiModel.generateContent([message, ...convImages]);
-  const response = await res.response; 
-  //need to convert final response as a stringified version1 
-  const txt = response.text(); 
-  const products = txt.split(":");
-  console.log(`products: \n`)
-  console.log(products); 
-  return products; 
+  const res = await geminiModel.generateContent([message, ...convImages]);
+  return await res.response.text().split(":");
 };
 
 const HomePage = ({}) => {
   const navigate = useNavigate();
-  //state keeping track of uploaded images describing gift so far! 
+  const location = useLocation();
+
   const [images, setImages] = React.useState([]);
   const handleImagesChange = (newFiles) => {
-    setImages((prevFiles) => [...prevFiles, ...newFiles]); 
-  }; 
-  const [sliderValue, setSliderValue] = React.useState([20, 40]);
-  const handleSliderChange = (event) => {
-    setSliderValue(event.target.value);
+    setImages((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+  const [sliderValue, setSliderValue] = React.useState([10, 20]);
+  const handleSliderChange = (event, newValue) => {
+    if (newValue[1] - newValue[0] >= 10) {
+      setSliderValue(newValue);
+    }
   };
 
   const [ageValue, setAgeValue] = React.useState("");
@@ -117,10 +110,10 @@ const HomePage = ({}) => {
   };
 
   const [moreInfo, setMoreInfo] = useState("");
+  const [apiKey, setApiKey] = useState("");
 
-  const [recommendation, setRecommendation] = useState("");
-  console.log(`recommendation: ${recommendation}`)
   const [loading, setLoading] = useState(false);
+  const [recommendation, setRecommendation] = useState("");
   const handleGeneratePlan = async () => {
     setLoading(true);
     const response = await getGeminiRequests(
@@ -131,32 +124,49 @@ const HomePage = ({}) => {
       moreInfo,
       images
     );
-    //const rec = response.choices[0].message.content
-    setRecommendation(response);
-    console.log(`response in handleGeneratePlan: \n`)
-    console.log(response); 
     setLoading(false);
-    setIsPlanGenerated(true);
-    //change to recommendations page and pass on the gpt returned resp to use for rendering 
-    //product recs! 
-    navigate("/recommendations", {state: {recommendation: response}}); 
+    navigate("/recommendations", {
+      state: {
+        recommendation: response,
+        sliderValue,
+        ageValue,
+        relationshipValue,
+        genderValue,
+        moreInfo,
+        images,
+        apiKey,
+      },
+    });
   };
-  const [isPlanGenerated, setIsPlanGenerated] = useState(false);
+
   const Loader = () => {
     const [text, setText] = useState("");
     useEffect(() => {
       const interval = setInterval(() => {
         setText((prevText) => {
-          if (prevText.length === 3) {
-            return "";
-          }
-          return prevText + ".";
+          return prevText.length === 3 ? "" : prevText + ".";
         });
       }, 300);
       return () => clearInterval(interval);
     }, []);
     return <h4>Recommendation is loading, please wait{text}</h4>;
   };
+
+  const setAllStatesFromLocation = (state) => {
+    setSliderValue(state.sliderValue);
+    setAgeValue(state.ageValue);
+    setRelationshipValue(state.relationshipValue);
+    setGenderValue(state.genderValue);
+    setMoreInfo(state.moreInfo);
+    setImages(state.images);
+    setApiKey(state.apiKey);
+  };
+
+  useEffect(() => {
+    if (location.state) {
+      setAllStatesFromLocation(location.state);
+    }
+  }, [location]);
 
   return (
     <Box
@@ -171,13 +181,12 @@ const HomePage = ({}) => {
     >
       <Header />
       <div>
-        <Container
-          maxWidth="sm"
-          style={{ marginTop: "65px", marginBottom: "75px" }}
-        >
+        <Container maxWidth="sm" style={{ marginTop: "65px" }}>
           <Box sx={{ minWidth: 200 }}>
             <FormControl fullWidth sx={{ my: 2 }}>
-              <DropzoneAreaExample handleImagesChange={handleImagesChange}></DropzoneAreaExample>
+              <DropzoneAreaExample
+                handleImagesChange={handleImagesChange}
+              ></DropzoneAreaExample>
             </FormControl>
 
             <FormControl fullWidth>
@@ -282,7 +291,7 @@ const HomePage = ({}) => {
                 value={sliderValue}
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"
-                min={0}
+                min={10}
                 max={1000}
                 sx={{
                   "& .MuiSlider-thumb": {
@@ -305,7 +314,7 @@ const HomePage = ({}) => {
               </Typography>
             </FormControl>
 
-            <FormControl fullWidth sx={{ textAlign: "center", mb: 4 }}>
+            <FormControl fullWidth sx={{ textAlign: "center" }}>
               <InputLabel
                 id="demo-simple-select-label"
                 sx={{ textAlign: "center" }}
@@ -324,6 +333,22 @@ const HomePage = ({}) => {
                   width: "100%",
                   margin: "0 auto",
                 }}
+              />
+            </FormControl>
+
+            <FormControl fullWidth sx={{ textAlign: "center", mb: 2 }}>
+              <InputLabel
+                id="demo-simple-select-label"
+                sx={{ textAlign: "center" }}
+              ></InputLabel>
+              <TextField
+                label="Gemini API Key"
+                variant="outlined"
+                margin="normal"
+                size="small"
+                fullWidth
+                value={apiKey}
+                onChange={(event) => setApiKey(event.target.value)}
               />
             </FormControl>
 
@@ -348,21 +373,11 @@ const HomePage = ({}) => {
                   },
                 }}
               >
-                {isPlanGenerated
-                  ? "Want a different one"
-                  : "Get Recommendations"}
+                Get Recommendations
               </Button>
             </FormControl>
 
             {loading && <Loader sx={{ mb: 2 }} />}
-
-            {recommendation && (
-              <Box sx={{ minWidth: 200, mb: 2 }}>
-                <Card>
-                  <div>{recommendation}</div>
-                </Card>
-              </Box>
-            )}
           </Box>
         </Container>
       </div>
