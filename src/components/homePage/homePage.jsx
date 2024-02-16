@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./homePage.css";
 import {
   Slider,
@@ -10,56 +11,47 @@ import {
   Box,
   TextField,
   Button,
-  Grid,
   Typography,
   Container,
   Divider,
-  Card,
 } from "@mui/material";
 
 import DropzoneAreaExample from "../dropZone/dropZone";
 import BottomNavbar from "../bottomNavBar/bottomNavBar";
 import Header from "../header/header";
 import { useNavigate, useLocation } from "react-router-dom";
-import OpenAI from "openai";
 
-const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY || "";
-
-const openai = new OpenAI({
-  apiKey: openaiApiKey,
-  dangerouslyAllowBrowser: true,
-  organization: "org-e8a4OqaRbXH1rSndFxTMj8KJ",
-});
-
-const getGPTRequests = async (
-  sliderValue,
-  ageValue,
-  relationshipValue,
-  genderValue,
-  moreInfo
-) => {
-  const message = `Analyze styles and preferences to suggest the perfect, stress-free gift 
-                  based on the following information about the person receiving this gift:
-                  Budget Range: ${sliderValue}, Age Range: ${ageValue}, Who am I giving it to: ${relationshipValue}, Gender: ${genderValue}, Details: ${moreInfo}, 
-                  give me 3 products with names and a short description for each product in 50 words using this following format: 
-                  Recommended Product1: name of product1, Description:
-                  Recommended Product2: name of product2, Description:
-                  Recommended Product3: name of product3, Description: `;
-  const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo-16k",
-    messages: [{ role: "user", content: message }],
-    temperature: 2,
-    max_tokens: 1000,
+const getGeminiRequests = async (images) => {
+  const imageData = new FormData();
+  images.forEach((img) => {
+    imageData.append("images", img);
   });
-  return response;
+  const res = await axios.post(
+    "https://www.giftguru.fun/gemini",
+    imageData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  const text = res.data.text;
+  return text.split(":");
 };
 
 const HomePage = ({}) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [sliderValue, setSliderValue] = React.useState([20, 40]);
-  const handleSliderChange = (event) => {
-    setSliderValue(event.target.value);
+  const [images, setImages] = React.useState([]);
+  const handleImagesChange = (newFiles) => {
+    setImages((prevFiles) => [...prevFiles, ...newFiles]);
+  };
+  const [sliderValue, setSliderValue] = React.useState([30, 100]);
+  const handleSliderChange = (event, newValue) => {
+    if (newValue[1] - newValue[0] >= 10) {
+      setSliderValue(newValue);
+    }
   };
 
   const [ageValue, setAgeValue] = React.useState("");
@@ -78,40 +70,56 @@ const HomePage = ({}) => {
   };
 
   const [moreInfo, setMoreInfo] = useState("");
+  const [apiKey, setApiKey] = useState("");
 
-  const [recommendation, setRecommendation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recommendation, setRecommendation] = useState("");
   const handleGeneratePlan = async () => {
     setLoading(true);
-    const response = await getGPTRequests(
-      sliderValue,
-      ageValue,
-      relationshipValue,
-      genderValue,
-      moreInfo
-    );
-    setRecommendation(response.choices[0].message.content);
+    const response = await getGeminiRequests(images);
     setLoading(false);
-    setIsPlanGenerated(true);
+    navigate("/recommendations", {
+      state: {
+        recommendation: response,
+        sliderValue,
+        ageValue,
+        relationshipValue,
+        genderValue,
+        moreInfo,
+        images,
+        apiKey,
+      },
+    });
   };
-
-  const [isPlanGenerated, setIsPlanGenerated] = useState(false);
 
   const Loader = () => {
     const [text, setText] = useState("");
     useEffect(() => {
       const interval = setInterval(() => {
         setText((prevText) => {
-          if (prevText.length === 3) {
-            return "";
-          }
-          return prevText + ".";
+          return prevText.length === 3 ? "" : prevText + ".";
         });
       }, 300);
       return () => clearInterval(interval);
     }, []);
     return <h4>Recommendation is loading, please wait{text}</h4>;
   };
+
+  const setAllStatesFromLocation = (state) => {
+    setSliderValue(state.sliderValue);
+    setAgeValue(state.ageValue);
+    setRelationshipValue(state.relationshipValue);
+    setGenderValue(state.genderValue);
+    setMoreInfo(state.moreInfo);
+    setImages(state.images);
+    setApiKey(state.apiKey);
+  };
+
+  useEffect(() => {
+    if (location.state) {
+      setAllStatesFromLocation(location.state);
+    }
+  }, [location]);
 
   return (
     <Box
@@ -126,13 +134,12 @@ const HomePage = ({}) => {
     >
       <Header />
       <div>
-        <Container
-          maxWidth="sm"
-          style={{ marginTop: "65px", marginBottom: "75px" }}
-        >
+        <Container maxWidth="sm" style={{ marginTop: "65px" }}>
           <Box sx={{ minWidth: 200 }}>
             <FormControl fullWidth sx={{ my: 2 }}>
-              <DropzoneAreaExample></DropzoneAreaExample>
+              <DropzoneAreaExample
+                handleImagesChange={handleImagesChange}
+              ></DropzoneAreaExample>
             </FormControl>
 
             <FormControl fullWidth>
@@ -237,7 +244,7 @@ const HomePage = ({}) => {
                 value={sliderValue}
                 onChange={handleSliderChange}
                 valueLabelDisplay="auto"
-                min={0}
+                min={10}
                 max={1000}
                 sx={{
                   "& .MuiSlider-thumb": {
@@ -260,7 +267,7 @@ const HomePage = ({}) => {
               </Typography>
             </FormControl>
 
-            <FormControl fullWidth sx={{ textAlign: "center", mb: 4 }}>
+            <FormControl fullWidth sx={{ textAlign: "center" }}>
               <InputLabel
                 id="demo-simple-select-label"
                 sx={{ textAlign: "center" }}
@@ -296,6 +303,7 @@ const HomePage = ({}) => {
                 sx={{
                   borderRadius: 50,
                   width: "100%",
+                  marginTop: "20px",
                   background: "linear-gradient(45deg, #00b859, #007580)",
                   "&:hover": {
                     transform: "scale(1.02)",
@@ -303,21 +311,11 @@ const HomePage = ({}) => {
                   },
                 }}
               >
-                {isPlanGenerated
-                  ? "Want a different one"
-                  : "Get Recommendations"}
+                Get Recommendations
               </Button>
             </FormControl>
 
             {loading && <Loader sx={{ mb: 2 }} />}
-
-            {recommendation && (
-              <Box sx={{ minWidth: 200, mb: 2 }}>
-                <Card>
-                  <div>{recommendation}</div>
-                </Card>
-              </Box>
-            )}
           </Box>
         </Container>
       </div>
