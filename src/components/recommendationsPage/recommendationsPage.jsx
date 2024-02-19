@@ -31,9 +31,9 @@ const RecommendationsPage = () => {
   };
 
   const recommendations = data.recommendations;
-  const [visibleRange, setVisibleRange] = useState([0, 10]);
+  const [visibleRange, setVisibleRange] = useState([0, 9]);
   const handleShowMore = () => {
-    setVisibleRange([visibleRange[0] + 10, visibleRange[1] + 10]);
+    setVisibleRange([visibleRange[0] + 9, visibleRange[1] + 9]);
   };
   const visibleRecommendations = recommendations.slice(
     visibleRange[0],
@@ -69,7 +69,7 @@ const RecommendationsPage = () => {
         <Grid container spacing={2}>
           {visibleRecommendations.length > 0 ? (
             visibleRecommendations.map((recommendation, index) => (
-              <Grid item xs={6} key={index}>
+              <Grid item xs={4} key={index}>
                 <Card
                   sx={{
                     maxWidth: 345,
@@ -104,10 +104,14 @@ const RecommendationsPage = () => {
                     }}
                   />
                   <CardContent>
-                    <Typography noWrap variant="subtitle1">
+                    <Typography noWrap variant="subtitle1" textAlign="center">
                       {truncateText(recommendation.itemName, 20)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      textAlign="center"
+                    >
                       ${recommendation.itemPrice.toFixed(2)}
                     </Typography>
                   </CardContent>
@@ -135,7 +139,7 @@ const RecommendationsPage = () => {
                   },
                 }}
               >
-                Another 10 items
+                Another 9 items
               </Button>
             </Grid>
             <Grid item xs={6}>
