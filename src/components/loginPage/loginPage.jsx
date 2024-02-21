@@ -50,10 +50,16 @@ const LoginPage = () => {
   useEffect(() => {
     const handleScroll = () => {
       const bg = document.querySelector(".bg");
+      const bg2 = document.querySelector(".bg-2");
       if (bg) {
         const scrollY = window.scrollY;
         const parallaxShift = scrollY * 0.3;
         bg.style.transform = `translateY(-${parallaxShift}px)`;
+      }
+      if (bg2) {
+        const scrollY = window.scrollY;
+        const parallaxShift = scrollY * 0.3;
+        bg2.style.transform = `translateY(-${parallaxShift}px)`;
       }
     };
     window.addEventListener("scroll", handleScroll);
@@ -127,15 +133,19 @@ const LoginPage = () => {
       <div className="temp"></div>
       <div className="login" ref={loginRef}>
         <img
-          className="bg"
+          className={`bg ${isLogin ? "bg-appear" : "bg-disappear"}`}
           src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgDRIP_20.png"
+        />
+        <img
+          className={`bg bg-2 ${isSignUp ? "bg-appear" : "bg-disappear"}`}
+          src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgPoly%20characters%2017.png"
         />
         {isLogin && (
           <motion.div
             className="glass-login"
             initial={{ y: 700, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 50 }}
+            transition={{ type: "spring", stiffness: 75 }}
           >
             <div className="title">
               <img
@@ -215,7 +225,7 @@ const LoginPage = () => {
                 label="Remember me"
               />
             </div>
-            <div className="login-container">
+            <div className="login-button-container">
               <Button
                 variant="contained"
                 className="login-button"
@@ -257,7 +267,7 @@ const LoginPage = () => {
             className="glass-signup"
             initial={{ y: 700, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 50 }}
+            transition={{ type: "spring", stiffness: 75 }}
           >
             <span className="sign-up-2" onClick={onLoginClick}>
               Log In
