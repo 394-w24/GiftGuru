@@ -62,6 +62,19 @@ const LoginPage = () => {
     };
   }, []);
 
+  const [isLogin, setIsLogin] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  const onSignUpClick = () => {
+    setIsLogin(false);
+    setIsSignUp(true);
+  };
+
+  const onLoginClick = () => {
+    setIsSignUp(false);
+    setIsLogin(true);
+  };
+
   return (
     <>
       <div ref={splashRef} className="splash">
@@ -117,117 +130,140 @@ const LoginPage = () => {
           className="bg"
           src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgDRIP_20.png"
         />
-        <div className="glass">
-          <div className="title">
-            <img
-              className="icon"
-              src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgAvatar-UI-Unicorn-V2.svg"
-            />
-            <span>GiftGuru:</span>
-          </div>
-          <div className="slogan">
-            <span>
-              AI-Powered Gifting Made Personal
-              <span className="wave">&nbsp;💖</span>
-            </span>
-          </div>
-          <div className="login-container">
-            <div className="email-container">
-              <FormControl className="email-form">
-                <OutlinedInput
-                  className="email-input"
-                  type={"text"}
-                  value={email}
-                  placeholder={"Email or phone number"}
-                  sx={{
-                    "& fieldset": { border: "none" },
-                  }}
-                  onChange={(e) => setEmail(e.target.value)}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton edge="end">
-                        <AccountCircleIcon
-                          sx={{ color: "rgba(36,133,255, 0.7)" }}
-                        />
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
+        {isLogin && (
+          <motion.div
+            className="glass-login"
+            initial={{ y: 700, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 50 }}
+          >
+            <div className="title">
+              <img
+                className="icon"
+                src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgAvatar-UI-Unicorn-V2.svg"
+              />
+              <span>GiftGuru:</span>
             </div>
-            <div className="password-container">
-              <FormControl className="password-form">
-                <OutlinedInput
-                  className="password-input"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  placeholder={"Enter Password"}
-                  sx={{
-                    "& fieldset": { border: "none" },
-                  }}
-                  onChange={(e) => setPassword(e.target.value)}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                      >
-                        {showPassword ? (
-                          <VisibilityOff
-                            sx={{ color: "rgba(211,47,47, 0.7)" }}
+            <div className="slogan">
+              <span>
+                AI-Powered Gifting Made Personal
+                <span className="wave">&nbsp;💖</span>
+              </span>
+            </div>
+            <div className="login-container">
+              <div className="email-container">
+                <FormControl className="email-form">
+                  <OutlinedInput
+                    className="email-input"
+                    type={"text"}
+                    value={email}
+                    placeholder={"Email or phone number"}
+                    sx={{
+                      "& fieldset": { border: "none" },
+                    }}
+                    onChange={(e) => setEmail(e.target.value)}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton edge="end">
+                          <AccountCircleIcon
+                            sx={{ color: "rgba(36,133,255, 0.7)" }}
                           />
-                        ) : (
-                          <Visibility sx={{ color: "rgba(36,133,255, 0.7)" }} />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+                </FormControl>
+              </div>
+              <div className="password-container">
+                <FormControl className="password-form">
+                  <OutlinedInput
+                    className="password-input"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    placeholder={"Enter Password"}
+                    sx={{
+                      "& fieldset": { border: "none" },
+                    }}
+                    onChange={(e) => setPassword(e.target.value)}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <VisibilityOff
+                              sx={{ color: "rgba(211,47,47, 0.7)" }}
+                            />
+                          ) : (
+                            <Visibility
+                              sx={{ color: "rgba(36,133,255, 0.7)" }}
+                            />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+                </FormControl>
+              </div>
             </div>
-          </div>
-          <div className="other-container">
-            <FormControlLabel
-              control={<Switch defaultChecked className="switch" />}
-              label="Remember me"
-            />
-          </div>
-          <div className="login-container">
-            <Button
-              variant="contained"
-              className="login-button"
-              onClick={() => signInWithEmailPassword(email, password)}
-              sx={{ width: "300px" }}
-            >
-              Login
-            </Button>
-          </div>
-          <div className="bottom-line-container">
-            <span className="bottom-line" />
-            <span className="continue">Or continue with</span>
-            <span className="bottom-line" />
-          </div>
-          <div className="google-signin-container">
-            <Button
-              variant="contained"
-              className="google-sign-in-button"
-              onClick={signInWithGoogle}
-            >
-              <img src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgGoogle.svg" />
-            </Button>
-          </div>
-          <div className="sign-up-container">
-            <span>Dont have an account?&nbsp;</span>
-            <span className="sign-up">Sign up now</span>
-          </div>
-          <div className="arrow-container" onClick={() => scrollToSpalsh()}>
-            <div className="scroll-arrow"></div>
-            <div className="scroll-arrow"></div>
-            <div className="scroll-arrow"></div>
-          </div>
-        </div>
+            <div className="other-container">
+              <FormControlLabel
+                control={<Switch defaultChecked className="switch" />}
+                label="Remember me"
+              />
+            </div>
+            <div className="login-container">
+              <Button
+                variant="contained"
+                className="login-button"
+                onClick={() => signInWithEmailPassword(email, password)}
+                sx={{ width: "300px" }}
+              >
+                Login
+              </Button>
+            </div>
+            <div className="bottom-line-container">
+              <span className="bottom-line" />
+              <span className="continue">Or continue with</span>
+              <span className="bottom-line" />
+            </div>
+            <div className="google-signin-container">
+              <Button
+                variant="contained"
+                className="google-sign-in-button"
+                onClick={signInWithGoogle}
+              >
+                <img src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgGoogle.svg" />
+              </Button>
+            </div>
+            <div className="sign-up-container">
+              <span>Dont have an account?&nbsp;</span>
+              <span className="sign-up" onClick={onSignUpClick}>
+                Sign up now
+              </span>
+            </div>
+            <div className="arrow-container" onClick={() => scrollToSpalsh()}>
+              <div className="scroll-arrow"></div>
+              <div className="scroll-arrow"></div>
+              <div className="scroll-arrow"></div>
+            </div>
+          </motion.div>
+        )}
+        {isSignUp && (
+          <motion.div
+            className="glass-signup"
+            initial={{ y: 700, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 50 }}
+          >
+            <span className="sign-up-2" onClick={onLoginClick}>
+              Log In
+            </span>
+          </motion.div>
+        )}
       </div>
     </>
   );
