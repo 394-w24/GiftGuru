@@ -7,6 +7,7 @@ import {
   signInWithGoogle,
   signInWithEmailPassword,
   useAuthState,
+  uploadImage,
 } from "../../../utilities/firebaseUtils";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
@@ -19,9 +20,18 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import TextField from "@mui/material/TextField";
+import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 import "./loginPage.less";
 
 const LoginPage = () => {
+  const maleAvatarUrl =
+    "https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgcurly-hair-man.png";
+  const femaleAvatarUrl =
+    "https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imglong-hair-woman.png";
+
   const loginRef = useRef(null);
   const splashRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -34,7 +44,22 @@ const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [avatarUrl, setAvatarUrl] = useState(maleAvatarUrl);
+  const [userAvatarUrl, setUserAvatarUrl] = useState("");
+  const [signUpPhoneNumber, setSignUpPhoneNumber] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+  const [signUpGender, setSignUpGender] = useState("male");
+
+  const handleGenderChange = (event) => {
+    setSignUpGender(event.target.value);
+    event.target.value === "male"
+      ? setAvatarUrl(maleAvatarUrl)
+      : setAvatarUrl(femaleAvatarUrl);
+  };
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (e) => e.preventDefault();
 
@@ -71,14 +96,30 @@ const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
 
-  const onSignUpClick = () => {
+  const onGoSignUpClick = () => {
     setIsLogin(false);
     setIsSignUp(true);
   };
 
-  const onLoginClick = () => {
+  const onBackLoginClick = () => {
     setIsSignUp(false);
     setIsLogin(true);
+  };
+
+  const hiddenFileInput = useRef(null);
+
+  const handleClick = () => {
+    hiddenFileInput.current.click();
+  };
+
+  const handleAvatarUpload = async (event) => {
+    const image = event.target.files[0];
+    try {
+      const url = await uploadImage(image);
+      setUserAvatarUrl(url);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -251,7 +292,7 @@ const LoginPage = () => {
             </div>
             <div className="sign-up-container">
               <span>Dont have an account?&nbsp;</span>
-              <span className="sign-up" onClick={onSignUpClick}>
+              <span className="sign-up" onClick={onGoSignUpClick}>
                 Sign up now
               </span>
             </div>
@@ -269,9 +310,168 @@ const LoginPage = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 75 }}
           >
-            <span className="sign-up-2" onClick={onLoginClick}>
-              Log In
-            </span>
+            <div className="title">
+              <img
+                className="icon"
+                src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgAvatar-UI-Unicorn-V2.svg"
+              />
+              <span>Create an Account</span>
+            </div>
+            <div className="slogan-2-container">
+              <span className="slogan-2">
+                -- Join GiftGuru: Start Gifting Smarter
+                <span className="wave">&nbsp;🎁</span>
+              </span>
+            </div>
+            <div className="profile-image-container">
+              <input
+                type="file"
+                onChange={handleAvatarUpload}
+                style={{ display: "none" }}
+                ref={hiddenFileInput}
+              />
+              {userAvatarUrl && (
+                <img
+                  src={userAvatarUrl}
+                  className="user-profile-image"
+                  onClick={handleClick}
+                />
+              )}
+              {!userAvatarUrl && (
+                <img
+                  src={avatarUrl}
+                  className="profile-image"
+                  onClick={handleClick}
+                />
+              )}
+            </div>
+            <div className="signup-container">
+              <div className="signup-email-container">
+                <FormControl className="signup-email-form">
+                  <TextField
+                    className="signup-email-input"
+                    type="text"
+                    value={signUpEmail}
+                    label="Enter your email"
+                    onChange={(e) => setSignUpEmail(e.target.value)}
+                    variant="outlined"
+                    sx={{
+                      "& fieldset": { border: "none" },
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton edge="end">
+                            <AccountCircleIcon
+                              sx={{ color: "rgba(36,133,255, 0.7)" }}
+                            />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </FormControl>
+              </div>
+              <div className="signup-phone-container">
+                <FormControl className="signup-phone-form">
+                  <TextField
+                    className="signup-phone-input"
+                    type="text"
+                    value={signUpPhoneNumber}
+                    label="Enter your phone number"
+                    onChange={(e) => setSignUpPhoneNumber(e.target.value)}
+                    variant="outlined"
+                    sx={{
+                      "& fieldset": { border: "none" },
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton edge="end">
+                            <PhoneAndroidIcon
+                              sx={{ color: "rgba(36,133,255, 0.7)" }}
+                            />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </FormControl>
+              </div>
+              <div className="signup-password-container">
+                <FormControl className="signup-password-form">
+                  <TextField
+                    className="signup-password-input"
+                    type={showPassword ? "text" : "password"}
+                    value={signUpPassword}
+                    label="Enter your password"
+                    variant="outlined"
+                    sx={{
+                      "& fieldset": { border: "none" },
+                    }}
+                    onChange={(e) => setSignUpPassword(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? (
+                              <VisibilityOff
+                                sx={{ color: "rgba(211,47,47, 0.7)" }}
+                              />
+                            ) : (
+                              <Visibility
+                                sx={{ color: "rgba(36,133,255, 0.7)" }}
+                              />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </FormControl>
+              </div>
+            </div>
+            <div className="signup-gender-container">
+              <FormControl component="fieldset" className="gender">
+                <RadioGroup
+                  row
+                  aria-label="gender"
+                  value={signUpGender}
+                  onChange={handleGenderChange}
+                >
+                  <FormControlLabel
+                    value="female"
+                    control={<Radio />}
+                    label="Female"
+                  />
+                  <FormControlLabel
+                    value="male"
+                    control={<Radio />}
+                    label="Male"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+            <div className="signup-button-container">
+              <Button
+                variant="contained"
+                className="signup-button"
+                sx={{ width: "300px" }}
+              >
+                Sign Up
+              </Button>
+            </div>
+            <div className="back-login-container">
+              <span>Already have an account?&nbsp;</span>
+              <span className="back-login" onClick={onBackLoginClick}>
+                Login
+              </span>
+            </div>
           </motion.div>
         )}
       </div>
