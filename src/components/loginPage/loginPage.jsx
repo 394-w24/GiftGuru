@@ -109,15 +109,6 @@ const LoginPage = () => {
               )}
             </Suspense>
           </Canvas>
-          {/* <motion.img
-            src="https://raw.githubusercontent.com/Hongda-OSU/PicGo-2.3.1/master/imgdepositphotos_248717686-stock-illustration-sticker-of-a-cartoon-click.png"
-            className="click-me"
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{
-              repeat: Infinity,
-              duration: 1.2,
-            }}
-          /> */}
         </div>
       </div>
       <div className="temp"></div>
