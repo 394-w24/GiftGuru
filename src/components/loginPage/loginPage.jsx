@@ -2,8 +2,7 @@ import { useRef, useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import Gift from "./gift";
 import { Canvas } from "@react-three/fiber";
-import { Text } from '@react-three/drei';
-import { Environment, CameraShake } from "@react-three/drei";
+import { Environment, CameraShake, Text } from "@react-three/drei";
 import {
   signInWithGoogle,
   signInWithEmailPassword,
@@ -204,10 +203,12 @@ const LoginPage = () => {
                 color="black"
                 anchorX="center"
                 anchorY="middle" 
+                outlineColor="rgba(255, 255, 255, 1)"
+                outlineWidth={0.1}
                 position={[0, 4, 0]}
                 scale={[3, 2, 3]}
               >
-                Click
+                Click Me
               </Text>
             </Suspense>
           </Canvas>
