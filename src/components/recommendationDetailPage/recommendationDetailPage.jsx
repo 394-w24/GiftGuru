@@ -16,10 +16,14 @@ import StarHalfIcon from "@mui/icons-material/StarHalf";
 import BottomNavbar from "../bottomNavBar/bottomNavBar";
 import Header from "../header/header";
 
-const RecommendationDetailPage = () => {
+const RecommendationDetailPage = ({ test, testState }) => {
   const { state } = useLocation();
-  console.log(state);
-  const { recommendation } = state;
+  let recommendation;
+  if (test) {
+    recommendation = testState.recommendation;
+  } else {
+    recommendation = state.recommendation;
+  }
 
   // Function to truncate text if needed
   const truncateText = (text, maxLength) => {
@@ -46,19 +50,33 @@ const RecommendationDetailPage = () => {
             <Card sx={{ mb: 2 }}>
               <CardMedia
                 component="img"
+                data-testid="thumbnail"
                 sx={{ width: "200px", margin: "auto" }}
                 image={recommendation.thumbnail}
                 alt={truncateText(recommendation.title, 20)}
               />
               <Box sx={{ p: 2 }}>
-                <Typography gutterBottom variant="subtitle1" component="div">
+                <Typography
+                  gutterBottom
+                  variant="subtitle1"
+                  component="div"
+                  data-testid="title"
+                >
                   {recommendation.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  data-testid="price"
+                >
                   ${recommendation.extracted_price.toFixed(2)}
                 </Typography>
                 <Divider sx={{ my: 1 }} />
-                <Typography variant="subtitle2" color="text.secondary">
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  data-testid="rating"
+                >
                   <StarHalfIcon
                     sx={{
                       width: 18,
@@ -67,7 +85,11 @@ const RecommendationDetailPage = () => {
                   />
                   {recommendation.rating}
                 </Typography>
-                <Typography variant="subtitle2" color="text.secondary">
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  data-testid="reviews"
+                >
                   <VisibilityIcon
                     sx={{
                       width: 18,
@@ -76,13 +98,18 @@ const RecommendationDetailPage = () => {
                   />
                   {recommendation.reviews}
                 </Typography>
-                <Typography variant="subtitle2" color="text.secondary">
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  data-testid="delivery"
+                >
                   {recommendation.delivery}
                 </Typography>
               </Box>
             </Card>
 
             <Card
+              id="source"
               sx={{
                 backgroundColor: "#f0f8ff",
                 display: "flex",
@@ -126,6 +153,7 @@ const RecommendationDetailPage = () => {
             </Card>
 
             <Card
+              id="compare"
               sx={{
                 backgroundColor: "#f0f8ff",
                 display: "flex",
@@ -167,6 +195,7 @@ const RecommendationDetailPage = () => {
 
             {recommendation["number_of_comparisons"] && (
               <Card
+                id="comparisions"
                 sx={{
                   backgroundColor: "#f0f8ff",
                   display: "flex",
