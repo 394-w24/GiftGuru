@@ -27,7 +27,7 @@ describe("DropzoneAreaExample", () => {
     expect(handleImagesChange).toHaveBeenCalledWith([file1, file2]); 
   });
 
-  it("The user must upload the image format", async () => {
+  it("Users can only upload images.", async () => {
     const handleImagesChange = jest.fn();
     const { getByTestId } = render(<DropzoneAreaExample handleImagesChange={handleImagesChange} />);
     const imageFile = createMockFile("valid-image.jpg", 1024, "image/jpeg");
