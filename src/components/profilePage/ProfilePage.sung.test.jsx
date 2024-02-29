@@ -31,5 +31,13 @@ describe('ProfilePage Testing', ()=> {
         const deleteBtn = screen.getByText(/DELETE ACCOUNT/i);
         expect(deleteBtn.tagName).toBe('BUTTON');
         expect(deleteBtn.textContent).toBe('DELETE ACCOUNT'); 
+
+        //check for user credentials also appearing! 
+        const nameHeader = screen.getByText(/Jane Doe/i);
+        const emailHeader = screen.getByText(/Email: janedoe@gmail.com/);
+        expect(nameHeader.tagName).toBe('H6');
+        expect(nameHeader.textContent).toBe(sampleUser.displayName);
+        expect(emailHeader.tagName).toBe('H6');
+        expect(emailHeader.textContent).toBe(`Email: ${sampleUser.email}`); 
     }); 
 });  
