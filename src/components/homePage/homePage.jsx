@@ -27,7 +27,7 @@ const getGeminiRequests = async (images) => {
     imageData.append("images", img);
   });
   const res = await axios.post(
-    "https://www.giftguru.fun/gemini",
+    "http://localhost:3000/gemini/",
     imageData,
     {
       headers: {
