@@ -26,4 +26,18 @@ describe("DropzoneAreaExample", () => {
     });
     expect(handleImagesChange).toHaveBeenCalledWith([file1, file2]); 
   });
+
+  it("The user must upload the image format", async () => {
+    const handleImagesChange = jest.fn();
+    const { getByTestId } = render(<DropzoneAreaExample handleImagesChange={handleImagesChange} />);
+    const imageFile = createMockFile("valid-image.jpg", 1024, "image/jpeg");
+    const nonImageFile = createMockFile("invalid-document.txt", 512, "text/plain");
+    const dropzone = getByTestId("dropzone"); 
+    fireEvent.drop(dropzone, {
+      dataTransfer: {
+        files: [imageFile, nonImageFile],
+      },
+    });
+    expect(handleImagesChange).toHaveBeenCalledWith([imageFile]); 
+  });
 });
