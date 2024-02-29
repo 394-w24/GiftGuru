@@ -96,9 +96,17 @@ const HomePage = ({}) => {
     }
   };
 
-  const [images, setImages] = React.useState([]);
+  // const [images, setImages] = React.useState([]);
+
+  const [images, setImages] = useState(() => {
+    // Retrieve images from localStorage on component mount
+    const storedImages = localStorage.getItem("uploadedImages");
+    return storedImages ? JSON.parse(storedImages) : [];
+  });
+
   const handleImagesChange = (newFiles) => {
     setImages((prevFiles) => [...prevFiles, ...newFiles]);
+    localStorage.setItem("uploadedImages", JSON.stringify([...images, ...newFiles]));
   };
   const [sliderValue, setSliderValue] = React.useState([10, 150]);
   const handleSliderChange = (event, newValue) => {
@@ -158,6 +166,14 @@ const HomePage = ({}) => {
       },
     });
   };
+
+  useEffect(() => {
+    // Retrieve images from localStorage on component mount
+    const storedImages = localStorage.getItem("uploadedImages");
+    if (storedImages) {
+      setImages(JSON.parse(storedImages));
+    }
+  }, []); // Add an empty dependency array to ensure this effect runs only once on mount
 
   const Loader = () => {
     const [text, setText] = useState("");
@@ -268,10 +284,13 @@ const HomePage = ({}) => {
         <Container maxWidth="sm" style={{ marginTop: "65px" }}>
           <Box sx={{ minWidth: 200 }}>
             <FormControl fullWidth sx={{ my: 2 }}>
+              
               <DropzoneAreaExample
                 handleImagesChange={handleImagesChange}
+                images={images}
               ></DropzoneAreaExample>
             </FormControl>
+          
 
             <FormControl fullWidth>
               <Typography variant="body2" gutterBottom>
