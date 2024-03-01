@@ -390,19 +390,20 @@ const HomePage = ({}) => {
             </FormControl>
 
             <FormControl fullWidth sx={{ mb: 1 }}>
-              <InputLabel id="demo-simple-select-label">
+                
+              <InputLabel id="gender-select-label"data-testid="select" >
                 Select gender
               </InputLabel>
               <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
+                labelId="gender-select-label"
+                id="gender-select"
                 value={genderValue}
                 label="Gender"
                 onChange={handleGenderChange}
               >
-                <MenuItem value={"male"}>Male</MenuItem>
-                <MenuItem value={"female"}>Female</MenuItem>
-                <MenuItem value={"other"}>Other</MenuItem>
+                <MenuItem value={"male"} data-testid="male">Male</MenuItem>
+                <MenuItem value={"female"} id="female">Female</MenuItem>
+                <MenuItem value={"other"} id="other">Other</MenuItem>
               </Select>
             </FormControl>
 
