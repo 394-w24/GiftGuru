@@ -160,7 +160,7 @@ const LoginPage = () => {
         <div className="one">
           <div></div>
         </div>
-        <div className="two">
+        <div className="two" data-cy="title">
           <motion.h2
             className="splash-title"
             initial={{ opacity: 0, scale: 0.5 }}
