@@ -40,10 +40,10 @@ describe("User can't generate recommendation button without filling in all requi
     });
     expect(recommendationButton).not.toBeNull();
     fireEvent.click(recommendationButton);
-    // const warningText = screen.queryByText(
-    //   /Please upload at least one image to get recommendations./i
-    // );
-    // expect(warningText).toBeNull();
+    const warningText = screen.queryByText(
+      /Please upload at least one image to get recommendations./i
+    );
+    expect(warningText).toBeNull();
 
     const warning = await screen.findByText(/warning/i);
     expect(warning).not.toBeNull();
